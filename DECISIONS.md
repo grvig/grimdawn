@@ -17,3 +17,19 @@ per-run artefact tied to one machine, one resolution and one game build, and it
 is rewritten on every run, so it is in `.gitignore`. The verdict that matters
 gets copied into `PROGRESS.md` by hand, where it is a durable record rather than
 a build output.
+
+## 2026-09-12 — Put key identity in Core, injection in Output
+
+Section 5 gives `GDPilot.Output` the SendInput wrappers and forbids `Core` from
+referencing it. A binding table has to name keys, so the `KeyCode` enumeration
+is pure data and lives in `Core`; only the P/Invoke that acts on it lives in
+`Output`. The enum's numeric values are the Windows virtual key codes, which
+lets the injector cast rather than translate.
+
+## 2026-09-12 — Centralised build settings
+
+Added `Directory.Build.props` at the root rather than repeating properties in
+every project file. It turns on nullable reference types, implicit usings and
+warnings as errors, and pins every project to x64. Warnings as errors is the
+part worth keeping: this project is mostly interop, where a warning is usually
+a real marshalling mistake.
