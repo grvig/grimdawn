@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9973E62F-A36C-4534-B4A4-340E5DE5A028}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDPilot.Core", "src\GDPilot.Core\GDPilot.Core.csproj", "{E2E21FC3-1F4A-4863-AF7B-5AFA031C24AC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4E45ED1C-6ECC-442D-907F-6F7EF1C32CCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDPilot.Core.Tests", "tests\GDPilot.Core.Tests\GDPilot.Core.Tests.csproj", "{B5329E89-E3C9-47DD-A520-54E1B4BD7F61}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E2E21FC3-1F4A-4863-AF7B-5AFA031C24AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E2E21FC3-1F4A-4863-AF7B-5AFA031C24AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2E21FC3-1F4A-4863-AF7B-5AFA031C24AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E2E21FC3-1F4A-4863-AF7B-5AFA031C24AC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5329E89-E3C9-47DD-A520-54E1B4BD7F61}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5329E89-E3C9-47DD-A520-54E1B4BD7F61}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5329E89-E3C9-47DD-A520-54E1B4BD7F61}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5329E89-E3C9-47DD-A520-54E1B4BD7F61}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E2E21FC3-1F4A-4863-AF7B-5AFA031C24AC} = {9973E62F-A36C-4534-B4A4-340E5DE5A028}
+		{B5329E89-E3C9-47DD-A520-54E1B4BD7F61} = {4E45ED1C-6ECC-442D-907F-6F7EF1C32CCF}
+	EndGlobalSection
+EndGlobal
