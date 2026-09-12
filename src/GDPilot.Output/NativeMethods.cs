@@ -86,4 +86,15 @@ internal static class NativeMethods
         internal uint Time;
         internal IntPtr ExtraInfo;
     }
+
+    internal static void SendOne(Input input)
+    {
+        Input[] batch = { input };
+        uint sent = SendInput(1, batch, Marshal.SizeOf<Input>());
+
+        if (sent != 1)
+        {
+            throw new InvalidOperationException($"SendInput rejected the event, error {Marshal.GetLastWin32Error()}.");
+        }
+    }
 }
