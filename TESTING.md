@@ -15,10 +15,12 @@ dotnet test
 Both must pass before every commit. No test in the suite needs a gamepad, and
 no test needs Grim Dawn running.
 
-One exception to that rule is coming: the loopback tests launch a real window
-and inject real operating system input at it. They pass without the game, but
-they do take over the keyboard and mouse for a moment while they run, so do not
-type during them.
+The loopback tests in `GDPilot.Integration.Tests` are the one place the suite
+touches the real operating system. They launch a small window titled
+"GDPilot Loopback", inject real key and mouse events, and assert what the
+window's global hooks recorded. The window swallows injected events after
+logging them, so nothing lands in other applications, and your own typing
+passes through untouched. The window closes when the tests finish.
 
 ## The three human tasks
 
