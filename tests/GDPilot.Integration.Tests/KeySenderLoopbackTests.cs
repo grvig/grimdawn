@@ -3,7 +3,8 @@ using GDPilot.Output;
 
 namespace GDPilot.Integration.Tests;
 
-public sealed class KeySenderLoopbackTests : IClassFixture<LoopbackFixture>
+[Collection(LoopbackCollection.Name)]
+public sealed class KeySenderLoopbackTests
 {
     private readonly LoopbackFixture loopback;
 
