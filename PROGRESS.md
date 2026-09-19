@@ -24,8 +24,8 @@ Phase 0 — self-scoring feasibility probe.
 | 1. Spike console project | Done |
 | 2. Window enumeration by observation | Done, smoke-run against a live desktop |
 | 3. Injection wrapper, virtual key and scancode | Done |
-| 4. Loopback harness and its test | Keyboard done and verified, mouse hook next |
-| 5. Self-scoring game probe | Scoring written and parked, capture and probe not started |
+| 4. Loopback harness and its test | Done, keyboard and mouse verified |
+| 5. Self-scoring game probe | Scoring done and tested, capture and probe next |
 | 6. Fallback ladder | Not started |
 
 ## Verified
@@ -34,14 +34,17 @@ Phase 0 — self-scoring feasibility probe.
 - `GDPilot.Spike --windows` lists visible top-level windows with their process
   names. Confirmed by running it. Grim Dawn was not running, so the game window
   itself is still unidentified.
-- Key injection reaches the operating system. The loopback tests send W through
-  `KeySender` in both modes and a global low-level hook records it: virtual key
-  0x57 in virtual key mode, scan code 0x11 in scancode mode.
+- Key injection reaches the operating system in both modes: virtual key 0x57
+  and scan code 0x11 for W, recorded by a global low-level hook.
+- Mouse injection reaches the operating system: a relative move travels the
+  right way, an absolute move lands within a pixel of its target, and both
+  buttons send down then up.
+- Absolute coordinates are correct on a scaled display. This machine runs
+  1920×1080 at 125%, and before the DPI fix an absolute move to x=200 landed
+  at 250.
+- Frame difference scoring and the probe verdict are unit-tested.
 
-2 automated tests committed, both passing.
-
-Not yet verified: mouse injection. `MouseSender` is written and builds, but the
-loopback window does not hook the mouse yet.
+21 automated tests, all passing.
 
 ## Blocked
 
@@ -59,15 +62,14 @@ Procedures live in [TESTING.md](TESTING.md).
 
 ## Next session starts here
 
-1. `git stash pop`. The stash "Probe frame scoring and verdict" holds four
-   files, written and passing, held back only to keep the day's commit count
-   down. `FrameDifference` scores two captures over a centred region, ignoring
-   alpha and the HUD margin. `ProbeVerdict` classifies a movement score against
-   an idle baseline as pass, fail or inconclusive, because rain or fire can
-   outscore a short walk in a quiet area. Commit as four pieces: each source
-   file, then each test file.
-2. Add the mouse hook to the loopback window and mouse tests for relative move,
-   absolute move and both buttons.
-3. Client-area capture of the game window, then the probe itself: idle capture,
-   one second of forward movement, capture, score, cursor delta check.
+1. Screen capture of a screen rectangle through GDI `BitBlt`, in a new
+   `GDPilot.Vision` project, since Phase 4 needs the same capture. Capture from
+   the screen rather than the window, because a borderless game draws through
+   DirectX and only the composited screen reliably holds its pixels.
+2. Test it by giving the loopback window a fixed, distinctive background colour
+   and asserting that a capture of its client area comes back that colour.
+3. The probe in the spike: locate the game window, idle capture pair, one
+   second of forward movement, capture pair, `ProbeVerdict`, cursor delta
+   check, write `SPIKE_RESULTS.md`. The spike must call
+   `DpiAwareness.EnablePerMonitor()` first.
 4. The fallback ladder, then raise HT-1.

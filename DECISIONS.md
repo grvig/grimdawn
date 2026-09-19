@@ -58,3 +58,22 @@ were mapped to `Debug|x64` in the solution, and earlier ones to `Any CPU`, so
 build output was split between `bin\Debug` and `bin\x64\Debug`. Removed the
 `Platforms` property and mapped every project to `Any CPU`. `PlatformTarget`
 still pins the binaries to x64, which is what the P/Invoke layer needs.
+
+## 2026-09-19 — Per-monitor DPI awareness for anything sending absolute input
+
+An absolute mouse move to x=200 landed at x=250 in the loopback test. This
+machine runs 1920×1080 at 125% scaling, and a process that has not declared
+DPI awareness is shown a virtual 1536×864 screen, so `GetSystemMetrics` and
+`GetCursorPos` are off by the scale factor. Grid navigation clicks computed cell
+centres, so it would have missed every cell by a quarter. Added
+`DpiAwareness.EnablePerMonitor()` in `GDPilot.Output`. Every process that
+reads or sends absolute coordinates calls it before creating a window: the test
+fixture now, the spike and the app when they do.
+
+## 2026-09-19 — One shared loopback window for all loopback tests
+
+A low-level hook sees injected input from every process on the machine, not
+only from its own test. xUnit runs test classes in parallel by default, so a
+key test class and a mouse test class each with their own loopback window would
+record each other's events. Both classes now belong to one xUnit collection
+that owns a single loopback window, which also makes them run one after another.
