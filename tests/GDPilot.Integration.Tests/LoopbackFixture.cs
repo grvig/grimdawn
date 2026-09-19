@@ -13,6 +13,7 @@ public sealed class LoopbackFixture : IDisposable
 
     public LoopbackFixture()
     {
+        GDPilot.Output.DpiAwareness.EnablePerMonitor();
         logPath = Path.Combine(Path.GetTempPath(), $"gdpilot-loopback-{Guid.NewGuid():N}.log");
         process = Process.Start(LoopbackExecutable(), $"\"{logPath}\"");
         WaitFor(lines => lines.Contains("ready"), TimeSpan.FromSeconds(15));
