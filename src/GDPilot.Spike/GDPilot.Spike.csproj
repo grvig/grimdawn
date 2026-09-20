@@ -8,4 +8,10 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\GDPilot.Core\GDPilot.Core.csproj" />
+    <ProjectReference Include="..\GDPilot.Output\GDPilot.Output.csproj" />
+    <ProjectReference Include="..\GDPilot.Vision\GDPilot.Vision.csproj" />
+  </ItemGroup>
+
 </Project>

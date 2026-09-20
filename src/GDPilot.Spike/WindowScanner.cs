@@ -33,6 +33,11 @@ internal static class WindowScanner
         return found;
     }
 
+    internal static WindowInfo Describe(IntPtr window)
+    {
+        return new WindowInfo(window, TitleOf(window), ProcessNameOf(window));
+    }
+
     private static string TitleOf(IntPtr window)
     {
         int length = NativeWindows.GetWindowTextLength(window);
