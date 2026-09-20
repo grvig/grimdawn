@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\GDPilot.Output\GDPilot.Output.csproj" />
+    <ProjectReference Include="..\..\src\GDPilot.Vision\GDPilot.Vision.csproj" />
     <!-- The tests launch this executable, and a full reference is what copies its assembly alongside the launcher. -->
     <ProjectReference Include="..\..\src\GDPilot.Loopback\GDPilot.Loopback.csproj" />
   </ItemGroup>

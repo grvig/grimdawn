@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace GDPilot.Integration.Tests;
 
@@ -11,12 +12,44 @@ public sealed class LoopbackFixture : IDisposable
     private readonly Process process;
     private readonly string logPath;
 
+    /// <summary>The window's client area in screen pixels, as the window reported it.</summary>
+    public (int X, int Y, int Width, int Height) ClientBounds { get; }
+
+    /// <summary>The colour the window paints its client area.</summary>
+    public (int Blue, int Green, int Red) Background { get; }
+
     public LoopbackFixture()
     {
         GDPilot.Output.DpiAwareness.EnablePerMonitor();
         logPath = Path.Combine(Path.GetTempPath(), $"gdpilot-loopback-{Guid.NewGuid():N}.log");
         process = Process.Start(LoopbackExecutable(), $"\"{logPath}\"");
-        WaitFor(lines => lines.Contains("ready"), TimeSpan.FromSeconds(15));
+
+        List<string> header = WaitFor(lines => lines.Contains("ready"), TimeSpan.FromSeconds(15));
+        Match bounds = Find(header, @"^client x=(-?\d+) y=(-?\d+) w=(\d+) h=(\d+)$");
+        Match colour = Find(header, @"^background b=(\d+) g=(\d+) r=(\d+)$");
+
+        ClientBounds = (Number(bounds, 1), Number(bounds, 2), Number(bounds, 3), Number(bounds, 4));
+        Background = (Number(colour, 1), Number(colour, 2), Number(colour, 3));
+    }
+
+    private static Match Find(List<string> lines, string pattern)
+    {
+        foreach (string line in lines)
+        {
+            Match match = Regex.Match(line, pattern);
+
+            if (match.Success)
+            {
+                return match;
+            }
+        }
+
+        throw new InvalidOperationException($"No loopback line matched {pattern}. Recorded:\n{string.Join("\n", lines)}");
+    }
+
+    private static int Number(Match match, int group)
+    {
+        return int.Parse(match.Groups[group].Value);
     }
 
     public int LineCount()
