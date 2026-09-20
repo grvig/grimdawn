@@ -77,3 +77,30 @@ only from its own test. xUnit runs test classes in parallel by default, so a
 key test class and a mouse test class each with their own loopback window would
 record each other's events. Both classes now belong to one xUnit collection
 that owns a single loopback window, which also makes them run one after another.
+
+## 2026-09-20 — The probe takes the foreground window
+
+Section 8 forbids hardcoding the game's window title or executable name. The
+probe counts down from five and takes whatever window is in front when it
+reaches zero, so the person running it identifies the game by bringing it
+forward. The report names the target it measured, which is also the check that
+the run is meaningful: a target line naming something else means the alt-tab
+missed and the scores describe the wrong window.
+
+## 2026-09-20 — Capture from the screen, not the window
+
+`ScreenCapture.Region` copies from the screen device context rather than the
+game window's own. A game drawing through DirectX leaves its window context
+empty, so a window capture would return blank frames and every probe would
+score zero, which looks identical to input being ignored. The composited screen
+always holds the pixels. `CAPTUREBLT` is set so a layered window over the
+region is included rather than skipped.
+
+## 2026-09-20 — The ladder automates two rungs, not four
+
+`FeasibilityLadder` climbs the two rungs that are a code change: virtual key
+codes, then scan codes. An inconclusive rung is retried once with a doubled
+hold before moving on. The remaining rungs in section 8 are not code: running
+the game windowed rather than borderless, and running elevated. Both are
+printed as guidance when every automated rung fails. The legacy `keybd_event`
+rung is not built yet.

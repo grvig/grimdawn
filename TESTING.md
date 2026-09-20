@@ -29,8 +29,37 @@ better fixture instead.
 
 ### HT-1 — Confirm the game accepts synthesized input
 
-Phase 0. Not yet ready to run. The procedure is written here when the spike
-executable builds.
+Phase 0. Ready to run. It takes about a minute and scores itself.
+
+Before starting, set the game up as section 4 of `PLAN.md` describes: Steam
+controller configuration off for the game, in-game controller support off,
+control scheme Keyboard Movement, display borderless windowed.
+
+1. Load a character and stand somewhere open and quiet. Rain, fire, moving
+   water and swaying trees all change the picture on their own, and the probe
+   measures how much the picture changes. A still, indoor spot is ideal.
+2. Leave the character standing still. Do not touch the mouse or keyboard once
+   step 4 starts.
+3. Alt-tab out of the game and run:
+
+   ```
+   dotnet run --project src/GDPilot.Spike -- --probe
+   ```
+
+4. It counts down from five. Alt-tab back into the game before it reaches zero.
+   Whichever window is in front when it hits zero is the window it measures.
+5. Wait. It runs for roughly fifteen seconds with the game in front, because
+   injected input only reaches the focused window. It beeps when it is done.
+6. Alt-tab back and read the verdict. It is also written to `SPIKE_RESULTS.md`
+   next to the executable.
+
+Report the single word after "Verdict": PASS, FAIL or INCONCLUSIVE.
+
+Check that the "Target:" line names the game. If it names something else, the
+alt-tab in step 4 did not land in time and the run means nothing.
+
+INCONCLUSIVE means the movement could not be told apart from the scene's own
+motion. Move somewhere stiller and run it again.
 
 ### HT-2 — Capture calibration fixtures
 
