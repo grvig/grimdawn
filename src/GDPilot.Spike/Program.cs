@@ -22,10 +22,31 @@ internal static class Program
             return 0;
         }
 
+        if (args.Contains("--probe"))
+        {
+            return Probe();
+        }
+
         Console.WriteLine("GDPilot feasibility probe.");
         Console.WriteLine();
         Console.WriteLine("  --windows   List visible top-level windows with their process names.");
         Console.WriteLine("  --target    Count down, then describe whichever window is in front.");
+        Console.WriteLine("  --probe     Score whether the game acts on synthesized input.");
+        return 0;
+    }
+
+    private static int Probe()
+    {
+        ProbeTarget target = TargetPicker.FromForegroundWindow(5);
+        List<ProbeRun> runs = FeasibilityLadder.Climb(target, TimeSpan.FromSeconds(1));
+        string report = SpikeResults.Compose(target, runs);
+
+        File.WriteAllText("SPIKE_RESULTS.md", report);
+        Console.WriteLine();
+        Console.WriteLine(report);
+
+        // The game has been in front the whole run, so tell the ear, not the eye.
+        Console.Beep();
         return 0;
     }
 
