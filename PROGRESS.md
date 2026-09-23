@@ -4,57 +4,52 @@ Read this first in every session, then the plan section for the current phase.
 
 ## Current phase
 
-Phase 0 — self-scoring feasibility probe. Waiting on HT-1.
+Phase 1 — input plumbing and safety, started while HT-1 is outstanding. Nothing
+in Phase 1 depends on its answer.
 
 ## State
 
 | Phase | Status |
 | --- | --- |
 | 0. Feasibility probe | Built, waiting on HT-1 |
-| 1. Input plumbing and safety | Not started |
+| 1. Input plumbing and safety | In progress |
 | 2. Mode state machine and overlay | Not started |
 | 3. Grid navigation by calibration | Not started |
 | 4. Occupancy detection | Not started |
 | 5. Macros and release | Not started |
 
-## Phase 0 checklist
+## Phase 1 checklist
 
 | Task | Status |
 | --- | --- |
-| 1. Spike console project | Done |
-| 2. Window enumeration by observation | Done |
-| 3. Injection wrapper, virtual key and scancode | Done |
-| 4. Loopback harness and its test | Done, keyboard and mouse verified |
-| 5. Self-scoring game probe | Done, smoke-run without the game |
-| 6. Fallback ladder | Two automated rungs done, legacy rung outstanding |
+| Gamepad snapshot and `IGamepadSource` | Done |
+| SDL binding chosen, `SdlGamepadSource` | Not started |
+| `ReplayGamepadSource` and trace fixtures | Not started |
+| Kill switch, release-all, watchdog | Not started, must land before anything presses keys on its own |
+| Focus watcher | Not started |
+| Resting stick calibration | Not started |
+| Radial deadzone with edge rescaling | Done |
+| Left stick to eight-way WASD | Not started |
+| Right stick cursor curve | Not started |
+| Button table and chord layer | Not started |
 
 ## Verified
 
 - The solution builds clean with warnings as errors on .NET 8.0.425.
-- Key injection reaches the operating system in both modes: virtual key 0x57
-  and scan code 0x11 for W, recorded by a global low-level hook.
-- Mouse injection reaches the operating system: a relative move travels the
-  right way, an absolute move lands within a pixel, and both buttons send down
-  then up.
-- Absolute coordinates are correct on a scaled display. This machine runs
-  1920×1080 at 125%, and before the DPI fix an absolute move to x=200 landed
-  at 250.
-- Screen capture returns real pixels. The loopback window paints itself a known
-  colour and a capture of its client area comes back that colour.
+- Key and mouse injection reach the operating system, in both key modes.
+- Absolute coordinates are correct on this 125% scaled display.
+- Screen capture returns real pixels from a known-colour window.
 - Frame difference scoring and the probe verdict are unit-tested.
+- The radial deadzone zeroes drift, preserves direction, rescales to reach full
+  magnitude from the deadzone edge, clamps square-gate corners, and still
+  reaches full magnitude with a drifted centre.
 
-25 automated tests, all passing.
-
-The probe was smoke-run end to end with no game present, against a window that
-happened to be in front. It captured, injected, scored, wrote `SPIKE_RESULTS.md`
-and beeped without crashing. That exercises the plumbing only. It says nothing
-about Grim Dawn, which is what HT-1 is for.
+38 automated tests, all passing, including from a cold rebuild.
 
 ## Blocked
 
-**HT-1 is outstanding.** The procedure is in [TESTING.md](TESTING.md). Nothing
-in Phase 1 depends on the answer: input reading, calibration, deadzones and the
-cursor curve are all unaffected, so that work continues while it waits.
+**HT-1 is outstanding.** The procedure is in [TESTING.md](TESTING.md). Phase 1
+continues regardless.
 
 ## Human tasks
 
@@ -66,16 +61,15 @@ cursor curve are all unaffected, so that work continues while it waits.
 
 ## Next session starts here
 
-Phase 1, which does not depend on HT-1:
-
-1. Evaluate SDL bindings for .NET, pick one that restores cleanly, record the
-   choice in `DECISIONS.md`, and put it behind `IGamepadSource`.
-2. The kill switch first, before anything presses a key on its own: global
-   hotkey, release-all, watchdog thread.
-3. Stick calibration and the radial deadzone, as pure maths in `GDPilot.Core`.
+1. Resting stick calibration in `GDPilot.Core`: the mean of 500 ms of samples,
+   rejected if the stick was plainly being held rather than resting.
+2. `ReplayGamepadSource` and the JSON trace format from section 6 of the plan,
+   so later mapping work can be tested end to end.
+3. Evaluate SDL bindings for .NET, pick one that restores cleanly, record the
+   choice here and in `DECISIONS.md`.
+4. The kill switch, before anything presses a key on its own.
 
 Outstanding in Phase 0, to pick up if HT-1 comes back FAIL:
 
 - The legacy `keybd_event` rung of the ladder.
 - The probe does not check that its target stayed in front for the whole run.
-  If a run looks wrong, that is the first thing to suspect.

@@ -104,3 +104,29 @@ hold before moving on. The remaining rungs in section 8 are not code: running
 the game windowed rather than borderless, and running elevated. Both are
 printed as guidance when every automated rung fails. The legacy `keybd_event`
 rung is not built yet.
+
+## 2026-09-23 — Positive Y is up in every stick value
+
+Hardware disagrees about stick Y: SDL reports down as positive, XInput reports
+up as positive. `StickPosition` fixes up as positive, the maths convention, so
+angles from `Atan2` mean what they look like and the movement and cursor maths
+never need to know which pad produced the value. Flipping is the job of the
+source adapter, once.
+
+## 2026-09-23 — Deadzone rescaling assumes the worst-case drift
+
+A drifted centre makes the throw shorter on the side the stick leans towards.
+Rescaling uses the whole drift magnitude as lost travel, in every direction. A
+full push towards the drift still reaches magnitude 1, but a push away from it
+saturates a little early. Per-direction reach would be exact but needs the
+stick's real gate shape, which calibration does not measure. Early saturation on
+one side is invisible in play. Never reaching full speed on one side is not.
+
+## 2026-09-23 — Capture test waits for the first paint
+
+The capture test failed once on a cold rebuild and passed on every rerun. The
+loopback window writes "ready" when it is shown, which is before its first
+paint reaches the screen, and a cold start widens that gap enough to capture
+whatever was underneath. The test now retries the capture for up to two
+seconds until the window's colour appears. It still fails if the colour never
+appears, so it still catches a broken capture.
