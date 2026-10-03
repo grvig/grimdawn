@@ -50,6 +50,9 @@ public readonly record struct GamepadSnapshot(
     double LeftTrigger,
     double RightTrigger)
 {
+    /// <summary>No buttons, both sticks centred, both triggers released.</summary>
+    public static readonly GamepadSnapshot Rest = new(GamepadButtons.None, StickPosition.Centre, StickPosition.Centre, 0, 0);
+
     public bool IsPressed(GamepadButtons buttons)
     {
         return (Buttons & buttons) == buttons;
