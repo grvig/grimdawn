@@ -130,3 +130,21 @@ paint reaches the screen, and a cold start widens that gap enough to capture
 whatever was underneath. The test now retries the capture for up to two
 seconds until the window's colour appears. It still fails if the colour never
 appears, so it still catches a broken capture.
+
+## 2026-10-03 — Calibration refuses rather than guesses
+
+Section 9 asks for the mean of 500 ms of resting samples. A mean alone cannot
+tell a resting stick from one a thumb is leaning on, and accepting the leaning
+one would make that push the new rest, so the character walks on its own once
+the thumb lets go. `TryFindCentre` refuses a mean beyond 0.3 from true centre,
+or any sample more than 0.08 from the mean, and the caller keeps its previous
+centre. Both limits sit well clear of a worn budget stick's real drift.
+
+## 2026-10-03 — Traces name their buttons, replay takes its clock
+
+The plan's trace format holds a button bitfield. Fixtures are written by hand,
+and `"buttons": 17` says nothing to a reader, so the parser also accepts names
+such as `"A, LeftBumper"` through the standard JSON enum converter. Axes a
+fixture omits are at rest. `ReplayGamepadSource` reads its time from a function
+the caller supplies rather than from a stopwatch, so a test steps through a
+trace exactly and the same trace always yields the same snapshots.
