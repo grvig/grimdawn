@@ -52,6 +52,33 @@ public sealed class LoopbackFixture : IDisposable
         return int.Parse(match.Groups[group].Value);
     }
 
+    /// <summary>
+    /// Puts the window back above every other topmost window, without activating
+    /// it. Being topmost is not enough: a topmost window activated after this one,
+    /// such as a desktop app in use while the suite runs, is drawn over it.
+    /// </summary>
+    public bool RaiseWindow()
+    {
+        process.Refresh();
+        return SetWindowPos(process.MainWindowHandle, new IntPtr(-1), 0, 0, 0, 0, NoSize | NoMove | NoActivate);
+    }
+
+    public IntPtr WindowHandle
+    {
+        get
+        {
+            process.Refresh();
+            return process.MainWindowHandle;
+        }
+    }
+
+    private const uint NoSize = 0x0001;
+    private const uint NoMove = 0x0002;
+    private const uint NoActivate = 0x0010;
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool SetWindowPos(IntPtr window, IntPtr insertAfter, int x, int y, int width, int height, uint flags);
+
     public int LineCount()
     {
         return ReadLines().Count;
