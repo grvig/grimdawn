@@ -148,3 +148,21 @@ such as `"A, LeftBumper"` through the standard JSON enum converter. Axes a
 fixture omits are at rest. `ReplayGamepadSource` reads its time from a function
 the caller supplies rather than from a stopwatch, so a test steps through a
 trace exactly and the same trace always yields the same snapshots.
+
+## 2026-10-10 — Intents are records, and released input is tracked centrally
+
+Section 6 names `IInputSink` and `RecordingSink` without saying what an intent
+is. Intents are C# records (`KeyDown`, `KeyUp`, `PointerMove`, `PointerMoveTo`,
+`PointerDown`, `PointerUp`), so a test compares a whole output sequence with one
+equality check. Held-input tracking lives in one decorator, `GuardedSink`,
+rather than in each caller, because the release path has to run from the kill
+switch, the watchdog, exceptions and process exit, and all of those must agree
+on what is held.
+
+## 2026-10-10 — The capture test reports instead of guessing
+
+Two guessed causes for the flaky capture test, a slow first paint and the
+window cascading off-screen, were each disproved. Rather than guess a third,
+the test now names the window that owns the pixel at the capture's centre when
+it fails. The first failure after that change named the cause: another
+application's window drawn over the loopback window.

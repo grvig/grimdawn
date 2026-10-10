@@ -26,7 +26,8 @@ in Phase 1 depends on its answer.
 | SDL binding chosen, `SdlGamepadSource` | Not started |
 | `ReplayGamepadSource` and the JSON trace format | Done |
 | Trace fixtures in `tests/fixtures/traces/` | Not started, arrive with the mapping work |
-| Kill switch, release-all, watchdog | Not started, must land before anything presses keys on its own |
+| Output intents, `IInputSink`, `RecordingSink` | Done |
+| Kill switch, release-all, watchdog | `GuardedSink` written and tested, parked in a stash; hotkey and watchdog not started |
 | Focus watcher | Not started |
 | Resting stick calibration | Done |
 | Radial deadzone with edge rescaling | Done |
@@ -51,16 +52,24 @@ in Phase 1 depends on its answer.
 
 ## Known issues
 
-**The screen capture loopback test is intermittently flaky.** It has failed twice
-in roughly thirty runs, and every rerun after a failure passed. Ruled out so far:
-a cold start after a rebuild, which reproduced cleanly twice with no failure, and
-the window cascading off-screen, since Windows wraps it back to the top left
-well before the edge. The two-second retry added on 2026-09-23 did not cure it.
-The remaining suspect, with no evidence yet, is another topmost window briefly
-drawing over that spot. The NVIDIA overlay is one candidate. The next step is
-diagnosis rather than another guess: on failure, report which window
-`WindowFromPoint` finds at the client centre and the most common captured
-colour.
+**The screen capture loopback test is flaky, and the cause is now identified.**
+On 2026-10-10 the test reported what was on screen when it failed: the window
+at the loopback window's centre belonged to another application in use at the
+time, drawn over the loopback window even though only the loopback window is
+topmost. The capture
+itself is correct. It returns exactly what is on screen.
+
+Established: launched on its own, the loopback window sits on top and a
+`SetWindowPos` raise succeeds. The capture test alone, and with the key tests,
+always passed. Failures came only in runs that included the mouse tests, at
+rates that swung from five in six to none in eight across one afternoon, with
+no code change between.
+
+Not established: why another window can rise above a topmost one during a test
+run. The test now raises its window before every capture attempt, which is
+correct but not proven to cure anything. A failure now also reports whether
+each window is topmost and whether the raise succeeded, so the next one should
+settle it.
 
 ## Blocked
 
@@ -77,10 +86,14 @@ continues regardless.
 
 ## Next session starts here
 
-1. Make the capture test diagnose itself on failure, as described above.
-2. Evaluate SDL bindings for .NET, pick one that restores cleanly, record the
-   choice in `DECISIONS.md`, and put it behind `IGamepadSource`.
-3. The kill switch, before anything presses a key on its own.
+1. `git stash pop`. The stash "Guarded sink with kill switch and its tests" holds
+   `GuardedSink` in full and its five tests, all passing. It tracks every held
+   key and button, checks the enabled flag under a lock immediately before each
+   injection, releases everything on `Disable`, and attempts every release even
+   if one fails. It is 122 lines and its tests 99, so it lands as several commits.
+2. If the capture test fails again, read its message before changing anything.
+3. The global kill switch hotkey and the watchdog, on top of `GuardedSink`.
+4. Evaluate SDL bindings for .NET and record the choice.
 
 Outstanding in Phase 0, to pick up if HT-1 comes back FAIL:
 
